@@ -26,9 +26,11 @@ func BenchmarkCreateHOG(b *testing.B) {
 	img := openFile("ProfilPicture_car.jpg")
 	imgGS := GrayScale(img)
 	b.ResetTimer()
+	//var HOG [][]uint8
 	for i := 0; i < b.N; i++ {
-		CreateHOG(imgGS)
+		CreateHOG(imgGS, img)
 	}
+	//viewHOG(HOG)
 }
 
 func BenchmarkGrayScale(b *testing.B) {
