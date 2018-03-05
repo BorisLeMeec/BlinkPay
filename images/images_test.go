@@ -24,19 +24,10 @@ func openFile(fileName string) (img image.Image) {
 
 func BenchmarkCreateHOG(b *testing.B) {
 	img := openFile("ProfilPicture_car.jpg")
-	imgGS := GrayScale(img)
 	b.ResetTimer()
-	//var HOG [][]uint8
-	for i := 0; i < b.N; i++ {
-		CreateHOG(imgGS, img, true)
-	}
-	//viewHOG(HOG)
 }
 
 func BenchmarkGrayScale(b *testing.B) {
 	img := openFile("ProfilPicture_car.jpg")
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		GrayScale(img)
-	}
 }
