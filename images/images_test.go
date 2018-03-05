@@ -28,7 +28,7 @@ func BenchmarkCreateHOG(b *testing.B) {
 	b.ResetTimer()
 	//var HOG [][]uint8
 	for i := 0; i < b.N; i++ {
-		CreateHOG(imgGS, img)
+		CreateHOG(imgGS, img, true)
 	}
 	//viewHOG(HOG)
 }

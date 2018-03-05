@@ -23,7 +23,9 @@ func GrayScale(img image.Image) (imgGS *image.Gray) {
 	return
 }
 
-func CreateHOG(img *image.Gray, img_original image.Image) {
+func CreateHOG(img *image.Gray, img_original image.Image, visualization bool) {
+	var cell_size = 8
+
 	var grads [][]GradientVector
 
 	grads = make([][]GradientVector, img.Bounds().Max.Y)
@@ -35,8 +37,28 @@ func CreateHOG(img *image.Gray, img_original image.Image) {
 			grads[y][x] = getGradient(img, y, x)
 		}
 	}
-	visualizeStep1(grads)
-	visualizeStep1Color(grads, img_original)
+	if visualization {
+		go visualizeStep1(grads)
+		go visualizeStep1Color(grads, img_original)
+	}
+
+	hsize := int(math.Ceil(float64(len(grads))/float64(cell_size))) + 1
+	vsize := int(math.Ceil(float64(len(grads[0]))/float64(cell_size))) + 1
+	var bins [][][9]float64 = make([][][9]float64, hsize)
+	for i := 0; i < hsize; i++ {
+		bins[i] = make([][9]float64, vsize)
+	}
+	i, j := 0, 0
+	for y := 0; y < len(grads)-1; y += cell_size {
+		j = 0
+		for x := 0; x < len(grads[y])-1; x += cell_size {
+			bins[i][j] = getBin(grads, x, y, cell_size)
+			j++
+		}
+		i++
+	}
+	//n_bins := normalize(grads, bins)
+	//fmt.Println(n_bins)
 }
 
 func getGradient(img *image.Gray, y, x int) (grad GradientVector) {
@@ -57,7 +79,63 @@ func getGradient(img *image.Gray, y, x int) (grad GradientVector) {
 	}
 	grad.Magnitude = math.Sqrt(math.Pow(float64(gradX), 2) + math.Pow(float64(gradY), 2))
 	// avoid division by zero
-	gradY = (map[bool]float64{true: 0, false: gradY})[gradY == 0] // equivalent of ternary operator
-	grad.Angle = uint8(int(math.Atan(float64(gradX)/float64(gradY))*math.Pi*180) % 180)
+	if gradY == 0 {
+		grad.Angle = 0
+	} else {
+		grad.Angle = uint8(int(math.Abs(math.Atan(float64(gradX)/float64(gradY))*math.Pi*180)) % 180)
+	}
+	return
+}
+
+func getBin(grads [][]GradientVector, x, y, cell_size int) (bin [9]float64) {
+	//bin = make([]float64, 9)
+
+	maxY := y + cell_size
+	if maxY >= len(grads) {
+		maxY = len(grads) - 1
+	}
+	maxX := x + cell_size
+	if maxX >= len(grads[y]) {
+		maxX = len(grads[y]) - 1
+	}
+	for i := y; i < maxY; i++ {
+		for j := x; j < maxX; j++ {
+			a := grads[i][j].Angle
+			bin[a/20] = (100 - ((float64(a-(a/20)*20) / float64(20)) * 100)) / 100 * grads[i][j].Magnitude
+			if a < 160 {
+				bin[a/20+1] += (100 - ((float64(a-(a/20)*20) / float64(20)) * 100)) / 100 * grads[i][j].Magnitude
+			} else {
+				bin[0] += ((float64(a-(a/20)*20) / float64(20)) * 100) / 100 * grads[i][j].Magnitude
+			}
+		}
+	}
+	return
+}
+
+func normalize(grads [][]GradientVector, bins [][][9]float64) (normalizeb_bins [][][9]float64) {
+	normalizeb_bins = make([][][9]float64, len(bins))
+	for i := 0; i < len(bins); i++ {
+		normalizeb_bins[i] = make([][9]float64, len(bins[i]))
+	}
+	for y := 0; y < len(bins)-1; y++ {
+		for x := 0; x < len(bins[y])-1; x++ {
+			val := 0
+			for i := 0; i < 2; i++ {
+				for j := 0; j < 2; j++ {
+					for a := 0; a < 9; a++ {
+						val += int(math.Pow(bins[y+i][x+j][a], 2))
+					}
+				}
+			}
+			n := math.Sqrt(float64(val))
+			for i := 0; i < 2; i++ {
+				for j := 0; j < 2; j++ {
+					for a := 0; a < 9; a++ {
+						normalizeb_bins[y+i][x+j][a] = bins[y+i][x+j][a] / float64(n)
+					}
+				}
+			}
+		}
+	}
 	return
 }
