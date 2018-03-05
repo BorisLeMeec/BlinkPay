@@ -12,7 +12,7 @@ func visualizeStep1(grads [][]GradientVector) {
 	for y := 0; y < len(grads); y++ {
 		for x := 0; x < len(grads[y]); x++ {
 			YDelta := uint8(grads[y][x].Magnitude)
-			var Y uint8 = 128
+			var Y uint8 = 0
 			if YDelta > 30 {
 				Y = 255
 			}
