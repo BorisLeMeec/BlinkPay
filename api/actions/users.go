@@ -4,6 +4,7 @@ import (
 	"github.com/BorisLeMeec/BlinkPay/api/models"
 	"github.com/satori/go.uuid"
 	"github.com/gobuffalo/buffalo"
+	"github.com/machinebox/sdk-go/facebox"
 )
 
 var db = make(map[uuid.UUID]models.User)
@@ -49,9 +50,16 @@ func (ur UserResource) Show(c buffalo.Context) error {
 }
 
 func (ur UserResource) Check(c buffalo.Context) error {
-	_, header, err := c.Request().FormFile("camera_pic")
+	file, header, err := c.Request().FormFile("camera_pic")
 	if err != nil {
 		return c.Render(500, r.String(err.Error()))
+	}
+	faceboxClient := facebox.New("http://localhost:8080")
+	faces, err := faceboxClient.Check(file)
+	if len(faces) == 1 {
+		if faces[0].Matched == true {
+			c.Render(200, r.String(faces[0].Name))
+		}
 	}
 	return c.Render(200, r.JSON(header.Filename))
 }
