@@ -16,15 +16,17 @@ func (ur UserResource) List(c buffalo.Context) error {
 
 func (ur UserResource) Create(c buffalo.Context) error {
 	// new User
+	u := &models.User{}
+	u.FirstName = c.Request().FormValue("FirstName")
+	u.LastName = c.Request().FormValue("LastName")
+	//if err := c.Bind(u1); err != nil {
+	//	return c.Render(500, r.String(err.Error()))
+	//}
 	id, _ := uuid.NewV4()
-	user := &models.User{
-		// on génère un nouvel id
-		ID: id,
-	}
-	// add in database
-	db[user.ID] = *user
+	u.ID = id
+	db[u.ID] = *u
 
-	return c.Render(201, r.JSON(user))
+	return c.Render(201, r.JSON(u))
 }
 
 func (ur UserResource) Show(c buffalo.Context) error {
@@ -44,4 +46,12 @@ func (ur UserResource) Show(c buffalo.Context) error {
 
 	// if not exist return not found
 	return c.Render(404, r.String("user not found"))
+}
+
+func (ur UserResource) Check(c buffalo.Context) error {
+	_, header, err := c.Request().FormFile("camera_pic")
+	if err != nil {
+		return c.Render(500, r.String(err.Error()))
+	}
+	return c.Render(200, r.JSON(header.Filename))
 }

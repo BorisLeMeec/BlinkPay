@@ -9,12 +9,26 @@ import (
 
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
+	//"gopkg.in/yaml.v2"
+	//"github.com/gobuffalo/buffalo/binding"
+	//"net/http"
+	//"io/ioutil"
 )
 
 // ENV is used to help switch settings based on where the
 // application is being run. Default is "development".
 var ENV = envy.Get("GO_ENV", "development")
 var app *buffalo.App
+
+//func init() {
+//	binding.Register("text/yaml", func(req *http.Request, model interface{}) error {
+//		b, err := ioutil.ReadAll(req.Body)
+//		if err != nil {
+//			return err
+//		}
+//		return yaml.Unmarshal(b, model)
+//	})
+//}
 
 // App is where all routes and middleware for buffalo
 // should be defined. This is the nerve center of your
@@ -28,6 +42,7 @@ func App() *buffalo.App {
 				cors.Default().Handler,
 			},
 			SessionName: "_api_session",
+			LooseSlash: true,
 		})
 		// Automatically redirect to SSL
 		app.Use(ssl.ForceSSL(secure.Options{
@@ -51,6 +66,7 @@ func App() *buffalo.App {
 		g.GET("/users", ur.List)
 		g.POST("/users", ur.Create)
 		g.GET("/users/{id}", ur.Show)
+		g.POST("/users/check", ur.Check)
 	}
 
 	return app
