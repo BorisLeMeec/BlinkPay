@@ -16,9 +16,10 @@ func (ur UserResource) List(c buffalo.Context) error {
 
 func (ur UserResource) Create(c buffalo.Context) error {
 	// new User
+	id, _ := uuid.NewV4()
 	user := &models.User{
 		// on génère un nouvel id
-		ID: uuid.NewV4(),
+		ID: id,
 	}
 	// add in database
 	db[user.ID] = *user
