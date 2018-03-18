@@ -50,7 +50,7 @@ func (ur UserResource) Show(c buffalo.Context) error {
 }
 
 func (ur UserResource) Check(c buffalo.Context) error {
-	file, header, err := c.Request().FormFile("camera_pic")
+	file, _, err := c.Request().FormFile("camera_pic")
 	if err != nil {
 		return c.Render(500, r.String(err.Error()))
 	}
