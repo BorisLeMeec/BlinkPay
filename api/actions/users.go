@@ -61,5 +61,5 @@ func (ur UserResource) Check(c buffalo.Context) error {
 			c.Render(200, r.String(faces[0].Name))
 		}
 	}
-	return c.Render(200, r.JSON(header.Filename))
+	return c.Render(401, r.String("no one recognized"))
 }
