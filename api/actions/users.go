@@ -58,7 +58,7 @@ func (ur UserResource) Check(c buffalo.Context) error {
 	faces, err := faceboxClient.Check(file)
 	if len(faces) == 1 {
 		if faces[0].Matched == true {
-			c.Render(200, r.String(faces[0].Name))
+			return c.Render(200, r.JSON(faces[0].Name))
 		}
 	}
 	return c.Render(401, r.String("no one recognized"))
