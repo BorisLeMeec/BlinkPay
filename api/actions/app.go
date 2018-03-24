@@ -63,11 +63,17 @@ func App() *buffalo.App {
 		// new UserResource
 		ur := &UserResource{}
 
+		g.GET("/test", TestURL)
 		g.GET("/users", ur.List)
 		g.POST("/users", ur.Create)
 		g.GET("/users/{id}", ur.Show)
 		g.POST("/users/check", ur.Check)
+
 	}
 
 	return app
+}
+
+func TestURL(c buffalo.Context) error {
+	return c.Render(200, r.JSON(map[string]string{"message": "Test successful!"}))
 }
