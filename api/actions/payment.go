@@ -2,11 +2,6 @@ package actions
 
 import (
 	"github.com/gobuffalo/buffalo"
-	"net/http"
-	"net/url"
-	"encoding/json"
-	"io/ioutil"
-	"fmt"
 	"github.com/machinebox/sdk-go/facebox"
 )
 
