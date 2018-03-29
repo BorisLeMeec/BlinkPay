@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"encoding/json"
 	"io/ioutil"
+	"fmt"
 )
 
 func Pay(c buffalo.Context) error {
@@ -15,6 +16,7 @@ func Pay(c buffalo.Context) error {
 		url.Values{"base64": {pictureEncoded}})
 	if err != nil {
 		c.Render(501, r.String("internal error"))
+		fmt.Println(err.Error())
 	}
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil{
