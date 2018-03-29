@@ -26,9 +26,9 @@ func Pay(c buffalo.Context) error {
 	json.Unmarshal(res, &rCheck)
 	if rCheck.Success == false || rCheck.FacesCount < 1 {
 		c.Render(401, r.JSON(ResultPayment{false, "no one recognized on the picture",
-				1, nil, nil}))
+				1, 0, ""}))
 	}
-	return c.Render(200, r.JSON(ResultPayment{true, nil, nil, 0,
+	return c.Render(200, r.JSON(ResultPayment{true, "", 0, 0,
 	rCheck.Faces[0].ID}))
 }
 
