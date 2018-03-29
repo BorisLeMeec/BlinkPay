@@ -13,11 +13,11 @@ func Pay(c buffalo.Context) error {
 	faces, err := faceboxClient.CheckBase64(pictureEncoded)
 
 	if err != nil {
-		return c.Render(500, r.JSON(ResultPayment{false, err.Error(), 1, 0, ""}))
+		return c.Render(401, r.JSON(ResultPayment{false, err.Error(), 1, 0, ""}))
 	}
 
 	return c.Render(200, r.JSON(ResultPayment{true, "", 0, 1,
-	faces[0].ID}))
+	faces[0].Name}))
 
 	//resp, err := http.PostForm("192.168.0.13:8080/facebox/check",
 	//	url.Values{"base64": {pictureEncoded}})
