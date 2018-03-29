@@ -14,7 +14,7 @@ func Pay(c buffalo.Context) error {
 	resp, err := http.PostForm("192.168.0.13:8080/facebox/check",
 		url.Values{"base64": {pictureEncoded}})
 	if err != nil {
-		c.Render(500, r.String("internal error"))
+		c.Render(501, r.String("internal error"))
 	}
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil{
