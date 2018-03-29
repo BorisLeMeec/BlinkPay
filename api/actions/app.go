@@ -64,7 +64,7 @@ func App() *buffalo.App {
 		ur := &UserResource{}
 
 		g.GET("/test", TestURL)
-		g.POST("/pay", Pay())
+		g.POST("/pay", Pay)
 		g.GET("/users", ur.List)
 		g.POST("/users", ur.Create)
 		g.GET("/users/{id}", ur.Show)
