@@ -7,52 +7,43 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"fmt"
+	"github.com/machinebox/sdk-go/facebox"
 )
 
 func Pay(c buffalo.Context) error {
 	// new User
 	pictureEncoded := c.Request().FormValue("base64")
-	resp, err := http.PostForm("192.168.0.13:8080/facebox/check",
-		url.Values{"base64": {pictureEncoded}})
+
+	faceboxClient := facebox.New("http://localhost:8080")
+	faces, err := faceboxClient.CheckBase64(pictureEncoded)
+
 	if err != nil {
-		c.Render(501, r.String("internal error"))
-		fmt.Println(err.Error())
-	}
-	res, err := ioutil.ReadAll(resp.Body)
-	if err != nil{
-		c.Render(500, r.String("Internal Error"))
+		return c.Render(500, r.JSON(ResultPayment{false, err.Error(), 1, 0, ""}))
 	}
 
-	var rCheck ResponseCheck
+	return c.Render(200, r.JSON(ResultPayment{true, "", 0, 1,
+	faces[0].ID}))
 
-	json.Unmarshal(res, &rCheck)
-	if rCheck.Success == false || rCheck.FacesCount < 1 {
-		c.Render(401, r.JSON(ResultPayment{false, "no one recognized on the picture",
-				1, 0, ""}))
-	}
-	return c.Render(200, r.JSON(ResultPayment{true, "", 0, 0,
-	rCheck.Faces[0].ID}))
-}
+	//resp, err := http.PostForm("192.168.0.13:8080/facebox/check",
+	//	url.Values{"base64": {pictureEncoded}})
+	//if err != nil {
+	//	c.Render(501, r.String("internal error"))
+	//	fmt.Println(err.Error())
+	//}
+	//res, err := ioutil.ReadAll(resp.Body)
+	//if err != nil{
+	//	c.Render(500, r.String("Internal Error"))
+	//}
 
-type ResponseCheck struct {
-	Success bool `json:"success"`
-	FacesCount int `json:"facesCount"`
-	Faces []Face `json:"faces"`
-}
+	//var rCheck ResponseCheck
 
-type Face struct {
-	Rect Rectangle `json:"rect"`
-	ID_pic string `json:"id"`
-	ID string `json:"name"`
-	Matched bool `json:"matched"`
-	Confidence float64 `json:"confidence"`
-}
-
-type Rectangle struct {
-	Top int `json:"top"`
-	Left int `json:"left"`
-	Width int `json:"width"`
-	Height int `json:"height"`
+	//json.Unmarshal(res, &rCheck)
+	//if rCheck.Success == false || rCheck.FacesCount < 1 {
+	//	c.Render(401, r.JSON(ResultPayment{false, "no one recognized on the picture",
+	//			1, 0, ""}))
+	//}
+	//return c.Render(200, r.JSON(ResultPayment{true, "", 0, 0,
+	//rCheck.Faces[0].ID}))
 }
 
 type ResultPayment struct {
