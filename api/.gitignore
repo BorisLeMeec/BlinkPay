@@ -12,3 +12,4 @@ api
 .vscode/
 .grifter/
 .env
+api/database.yml
